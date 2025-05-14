@@ -1,0 +1,59 @@
+{
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "typescript.preferences.importModuleSpecifier": "shortest",
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  "editor.rulers": [100],
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact"
+  ],
+  "eslint.workingDirectories": ["./frontend", "./backend"],
+  "tailwindCSS.includeLanguages": {
+    "typescript": "javascript",
+    "typescriptreact": "javascript"
+  },
+  "tailwindCSS.experimental.classRegex": [
+    ["cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"],
+    ["cn\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"]
+  ],
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/dist": true,
+    "**/.next": true
+  },
+  "files.exclude": {
+    "**/.git": true,
+    "**/.DS_Store": true,
+    "**/node_modules": true
+  },
+  "javascript.updateImportsOnFileMove.enabled": "always",
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "[prisma]": {
+    "editor.defaultFormatter": "Prisma.prisma"
+  },
+  "editor.quickSuggestions": {
+    "strings": true
+  },
+  "cursor.ai.features.copilotInstruction": {
+    "message": "DDDアーキテクチャに基づいたTypeScriptコードを書いています。Next.js（App Router）フロントエンドとNestJSバックエンドを使用したフリーランス向けタスク管理システムで、Tailwind CSSとShadcn UIを使用しています。コードはクリーンで、型安全性を重視し、RESTful APIを設計しています。DDDの原則（エンティティ、値オブジェクト、アグリゲート、リポジトリなど）に従ってください。Prisma ORMでPostgreSQLを操作します。コンポーネントは再利用性を考慮し、状態管理にはJotaiとReact Queryを使用します。バックエンドはオニオンアーキテクチャに基づきDDDを採用しています。"
+  },
+  "workbench.colorCustomizations": {
+    "activityBar.background": "#1E1E2E",
+    "titleBar.activeBackground": "#181825",
+    "statusBar.background": "#181825"
+  }
+}
