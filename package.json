@@ -1,0 +1,21 @@
+{
+  "name": "mytaskhub",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "docker compose up",
+    "dev:frontend": "npm run dev --workspace=@mytaskhub/frontend",
+    "dev:backend": "npm run dev --workspace=@mytaskhub/backend",
+    "build": "npm run build --workspaces",
+    "build:frontend": "npm run build --workspace=@mytaskhub/frontend",
+    "build:backend": "npm run build --workspace=@mytaskhub/backend",
+    "test": "npm run test --workspaces",
+    "lint": "npm run lint --workspaces"
+  },
+  "keywords": [],
+  "author": "Hiroki Seino",
+  "license": "ISC"
+}
