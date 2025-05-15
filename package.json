@@ -13,9 +13,22 @@
     "build:frontend": "npm run build --workspace=@mytaskhub/frontend",
     "build:backend": "npm run build --workspace=@mytaskhub/backend",
     "test": "npm run test --workspaces",
-    "lint": "npm run lint --workspaces"
+    "lint": "npm run lint --workspaces",
+    "prepare": "husky install"
+  },
+  "lint-staged": {
+    "packages/frontend/**/*.{js,jsx,ts,tsx}": [
+      "npm run lint --workspace=@mytaskhub/frontend"
+    ],
+    "packages/backend/**/*.{js,ts}": [
+      "npm run lint --workspace=@mytaskhub/backend"
+    ]
   },
   "keywords": [],
   "author": "Hiroki Seino",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "husky": "^8.0.0",
+    "lint-staged": "^16.0.0"
+  }
 }
