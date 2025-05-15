@@ -49,11 +49,196 @@
     "strings": true
   },
   "cursor.ai.features.copilotInstruction": {
-    "message": "DDDアーキテクチャに基づいたTypeScriptコードを書いています。Next.js（App Router）フロントエンドとNestJSバックエンドを使用したフリーランス向けタスク管理システムで、Tailwind CSSとShadcn UIを使用しています。コードはクリーンで、型安全性を重視し、RESTful APIを設計しています。DDDの原則（エンティティ、値オブジェクト、アグリゲート、リポジトリなど）に従ってください。Prisma ORMでPostgreSQLを操作します。コンポーネントは再利用性を考慮し、状態管理にはJotaiとReact Queryを使用します。バックエンドはオニオンアーキテクチャに基づきDDDを採用しています。"
+    "message": "MyTaskHub: フリーランス向けのタスク・プロジェクト・売上管理システム（DDD設計）\n\n【技術スタック】\n- フロントエンド: Next.js (App Router), TypeScript, Tailwind CSS + Shadcn UI, Jotai, React Query\n- バックエンド: NestJS, TypeScript, DDD (オニオンアーキテクチャ), RESTful API\n- データベース: PostgreSQL, Prisma ORM\n- 認証: Firebase Auth + JWT\n\n【ドメインモデル】\n- ユーザー (User): アプリケーションを使用するフリーランサー\n- クライアント (Client): フリーランサーの顧客企業\n- プロジェクト (Project): クライアントに紐づくプロジェクト\n- タスク (Task): プロジェクトに紐づく作業項目\n- タグ (Tag): タスクの分類用ラベル\n- 売上 (SalesEntry): プロジェクト/クライアントの売上記録\n\n【DDDパターン】\n- エンティティ: User, Client, Project, Task, Tag, SalesEntry\n- 値オブジェクト: TaskStatus, Priority, ProjectStatus, Money, Period, ContactInfo\n- アグリゲート: User, Task, Project, Client, SalesEntry\n- リポジトリ: 各エンティティに対応するリポジトリインタフェース\n- ドメインサービス: 集約をまたがるドメインロジック\n\n【API設計】\n- RESTful API\n- JWT認証\n- エンドポイント構造: /api/v1/{resource}\n- リソース: auth, users, tasks, projects, clients, sales, tags, dashboard\n\n【コード品質】\n- クリーンで型安全なコード\n- ドメインロジックの明確な分離\n- 適切な関心の分離\n- 再利用可能なコンポーネント\n- DDDの原則に準拠"
   },
   "workbench.colorCustomizations": {
     "activityBar.background": "#1E1E2E",
     "titleBar.activeBackground": "#181825",
     "statusBar.background": "#181825"
+  },
+  "projectInfo": {
+    "name": "MyTaskHub",
+    "description": "フリーランス向けのタスク・プロジェクト・売上管理システム",
+    "architecture": {
+      "frontend": {
+        "framework": "Next.js (App Router)",
+        "language": "TypeScript",
+        "styling": "Tailwind CSS + Shadcn UI",
+        "stateManagement": "Jotai",
+        "apiClient": "React Query",
+        "directoryStructure": {
+          "app": "Next.js App Router ページ",
+          "components": "UIコンポーネント",
+          "hooks": "カスタムフック",
+          "lib": "ユーティリティ関数",
+          "store": "Jotai状態管理",
+          "types": "型定義"
+        }
+      },
+      "backend": {
+        "framework": "NestJS",
+        "language": "TypeScript",
+        "architecture": "DDD (オニオンアーキテクチャ)",
+        "apiDesign": "RESTful API",
+        "auth": "Firebase Auth + JWT",
+        "database": "PostgreSQL",
+        "orm": "Prisma",
+        "layeredArchitecture": {
+          "domain": "エンティティ、値オブジェクト、ドメインサービス",
+          "application": "ユースケース、DTOとコマンド、イベントハンドラ",
+          "infrastructure": "リポジトリ実装、外部サービス連携",
+          "presentation": "RESTful APIコントローラー"
+        }
+      }
+    },
+    "domainModel": {
+      "boundedContexts": [
+        "ユーザー管理コンテキスト",
+        "タスク管理コンテキスト",
+        "プロジェクト管理コンテキスト",
+        "クライアント管理コンテキスト",
+        "売上管理コンテキスト"
+      ],
+      "entities": [
+        {
+          "name": "User",
+          "properties": [
+            "id",
+            "email",
+            "passwordHash",
+            "name",
+            "imageUrl",
+            "firebaseUid"
+          ],
+          "relationships": [
+            "clients",
+            "projects",
+            "tasks",
+            "tags",
+            "salesEntries"
+          ]
+        },
+        {
+          "name": "Client",
+          "properties": ["id", "name", "contactInfo", "userId"],
+          "relationships": ["user", "projects", "salesEntries"]
+        },
+        {
+          "name": "Project",
+          "properties": [
+            "id",
+            "name",
+            "description",
+            "colorHex",
+            "status",
+            "defaultPriority",
+            "clientId",
+            "userId"
+          ],
+          "relationships": ["client", "user", "tasks", "salesEntries"]
+        },
+        {
+          "name": "Task",
+          "properties": [
+            "id",
+            "title",
+            "content",
+            "status",
+            "priority",
+            "deadline",
+            "projectId",
+            "userId",
+            "completedAt"
+          ],
+          "relationships": ["project", "user", "tags"]
+        },
+        {
+          "name": "Tag",
+          "properties": ["id", "name", "colorHex", "userId"],
+          "relationships": ["user", "tasks"]
+        },
+        {
+          "name": "SalesEntry",
+          "properties": [
+            "id",
+            "amount",
+            "date",
+            "description",
+            "clientId",
+            "projectId",
+            "userId"
+          ],
+          "relationships": ["client", "project", "user"]
+        }
+      ],
+      "valueObjects": [
+        {
+          "name": "TaskStatus",
+          "values": ["TODO", "IN_PROGRESS", "DONE", "ARCHIVED"]
+        },
+        {
+          "name": "Priority",
+          "values": ["LOW", "MEDIUM", "HIGH", "URGENT"]
+        },
+        {
+          "name": "ProjectStatus",
+          "values": ["ACTIVE", "COMPLETED", "ARCHIVED"]
+        }
+      ]
+    },
+    "apiEndpoints": {
+      "auth": ["/auth/register", "/auth/login", "/auth/google", "/auth/me"],
+      "users": ["/users/profile", "/users/password"],
+      "tasks": ["/tasks", "/tasks/{id}", "/tasks/{id}/status"],
+      "projects": [
+        "/projects",
+        "/projects/{id}",
+        "/projects/{id}/status",
+        "/projects/{id}/tasks"
+      ],
+      "clients": ["/clients", "/clients/{id}", "/clients/{id}/projects"],
+      "sales": [
+        "/sales",
+        "/sales/{id}",
+        "/sales/summary/monthly",
+        "/sales/summary/clients"
+      ],
+      "tags": ["/tags", "/tags/{id}"],
+      "dashboard": [
+        "/dashboard/summary",
+        "/dashboard/recent-tasks",
+        "/dashboard/project-progress",
+        "/dashboard/sales-chart"
+      ]
+    },
+    "databaseSchema": {
+      "models": [
+        "User",
+        "Client",
+        "Project",
+        "Task",
+        "Tag",
+        "TagsOnTasks",
+        "SalesEntry"
+      ],
+      "enums": ["ProjectStatus", "TaskStatus", "Priority"],
+      "relations": [
+        "User 1:N Client",
+        "Client 1:N Project",
+        "Project 1:N Task",
+        "Task N:M Tag (through TagsOnTasks)",
+        "Client 1:N SalesEntry",
+        "Project 1:N SalesEntry"
+      ]
+    },
+    "features": [
+      "認証システム (JWT + Firebase Auth)",
+      "タスク管理 (ステータス、優先度、期限、タグ)",
+      "プロジェクト管理 (ステータス、カラーラベル)",
+      "クライアント管理",
+      "売上管理・集計",
+      "ダッシュボード",
+      "外部サービス連携 (Googleカレンダーなど)"
+    ]
   }
 }
