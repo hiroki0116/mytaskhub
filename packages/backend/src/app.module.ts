@@ -3,6 +3,9 @@ import { ConfigModule } from "@nestjs/config";
 import { PrismaModule } from "./prisma/prisma.module";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
+import { UserModule } from "./user/user.module";
+import { APP_FILTER } from "@nestjs/core";
+import { GlobalExceptionFilter } from "./common/filters/global-exception.filter";
 
 @Module({
   imports: [
@@ -10,8 +13,15 @@ import { AppService } from "./app.service";
       isGlobal: true,
     }),
     PrismaModule,
+    UserModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_FILTER,
+      useClass: GlobalExceptionFilter,
+    },
+  ],
 })
 export class AppModule {}
