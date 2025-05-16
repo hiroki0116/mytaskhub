@@ -1,30 +1,21 @@
-FROM node:18-alpine AS builder
+FROM node:18-alpine
 
 WORKDIR /app
+
+# 必要な依存関係をインストール
+RUN apk add --no-cache openssl
 
 COPY package*.json ./
 COPY packages/common/package*.json ./packages/common/
 COPY packages/backend/package*.json ./packages/backend/
 
-RUN npm ci
+RUN npm install
 
 COPY . .
 
-RUN npm run build:backend
-
-FROM node:18-alpine AS runner
-
-WORKDIR /app
-
-COPY --from=builder /app/package*.json ./
-COPY --from=builder /app/packages/common/package*.json ./packages/common/
-COPY --from=builder /app/packages/backend/package*.json ./packages/backend/
-COPY --from=builder /app/packages/common/dist ./packages/common/dist
-COPY --from=builder /app/packages/backend/dist ./packages/backend/dist
-COPY --from=builder /app/packages/backend/prisma ./packages/backend/prisma
-
-RUN npm ci --production7
+# Prismaクライアントの生成
+RUN cd packages/backend && npx prisma generate
 
 EXPOSE 3001
 
-CMD ["node", "packages/backend/dist/main.js"]
+CMD ["npm", "run", "start:dev", "--workspace=@mytaskhub/backend"]
