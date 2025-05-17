@@ -2,6 +2,7 @@
 
 import { Module } from "@nestjs/common";
 import { CqrsModule } from "@nestjs/cqrs";
+import { AuthController } from "src/presentation/controllers/auth.controller";
 import { PrismaModule } from "src/prisma/prisma.module";
 
 @Module({
@@ -11,8 +12,8 @@ import { PrismaModule } from "src/prisma/prisma.module";
     // Prismaを使用するためのモジュール
     PrismaModule,
   ],
-  controllers: [],
+  controllers: [AuthController],
   providers: [],
   exports: [],
 })
-export class UserModule {}
+export class AuthModule {}
