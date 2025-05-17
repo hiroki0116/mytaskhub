@@ -14,15 +14,13 @@ export class UserMapper {
     );
   }
 
-  toPersistence(user: User): Partial<PrismaUser> {
+  toPersistence(user: User): Omit<PrismaUser, "createdAt" | "updatedAt"> {
     return {
       id: user.id,
       email: user.email,
       name: user.name,
       firebaseUid: user.firebaseUid,
       imageUrl: user.imageUrl,
-      createdAt: user.createdAt,
-      updatedAt: user.updatedAt,
     };
   }
 }
