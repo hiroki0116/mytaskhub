@@ -1,15 +1,173 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
-  provider = "prisma-client-js"
-  output   = "../generated/prisma"
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-arm64-openssl-3.0.x"]
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+// ユーザーモデル
+model User {
+  id          String   @id @default(cuid())
+  email       String   @unique
+  name        String
+  imageUrl    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  firebaseUid String   @unique
+
+  // リレーション
+  clients      Client[]
+  projects     Project[]
+  tasks        Task[]
+  tags         Tag[]
+  salesEntries SalesEntry[]
+}
+
+// クライアントモデル
+model Client {
+  id          String   @id @default(cuid())
+  name        String
+  contactInfo Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  userId      String
+
+  // リレーション
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  projects     Project[]
+  salesEntries SalesEntry[]
+
+  // インデックス
+  @@index([userId])
+}
+
+// プロジェクトモデル
+model Project {
+  id              String        @id @default(cuid())
+  name            String
+  description     String?
+  colorHex        String        @default("#6366F1") // インディゴ色デフォルト
+  status          ProjectStatus @default(ACTIVE)
+  defaultPriority Priority      @default(MEDIUM)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  clientId        String?
+  userId          String
+
+  // リレーション
+  client       Client?      @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tasks        Task[]
+  salesEntries SalesEntry[]
+
+  // インデックス
+  @@index([userId])
+  @@index([clientId])
+}
+
+// タスクモデル
+model Task {
+  id          String     @id @default(cuid())
+  title       String
+  content     String?    @db.Text
+  status      TaskStatus @default(TODO)
+  priority    Priority   @default(MEDIUM)
+  deadline    DateTime?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  completedAt DateTime?
+  projectId   String
+  userId      String
+
+  // リレーション
+  project Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user    User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tags    TagsOnTasks[]
+
+  // インデックス
+  @@index([userId])
+  @@index([projectId])
+  @@index([status])
+  @@index([deadline])
+}
+
+// タグモデル
+model Tag {
+  id       String @id @default(cuid())
+  name     String
+  colorHex String @default("#6366F1")
+  userId   String
+
+  // リレーション
+  user  User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tasks TagsOnTasks[]
+
+  // インデックス
+  @@index([userId])
+}
+
+// タスクとタグの多対多リレーション
+model TagsOnTasks {
+  taskId String
+  tagId  String
+
+  // リレーション
+  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  tag  Tag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  // 複合プライマリーキー
+  @@id([taskId, tagId])
+  // インデックス
+  @@index([taskId])
+  @@index([tagId])
+}
+
+// 売上エントリーモデル
+model SalesEntry {
+  id          String   @id @default(cuid())
+  amount      Float
+  date        DateTime
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  clientId    String?
+  projectId   String?
+  userId      String
+
+  // リレーション
+  client  Client?  @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  project Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // インデックス
+  @@index([userId])
+  @@index([clientId])
+  @@index([projectId])
+  @@index([date])
+}
+
+// プロジェクトステータス列挙型
+enum ProjectStatus {
+  ACTIVE
+  COMPLETED
+  ARCHIVED
+}
+
+// タスクステータス列挙型
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  DONE
+  ARCHIVED
+}
+
+// 優先度列挙型
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
 }

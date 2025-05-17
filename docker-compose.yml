@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   postgres:
@@ -21,18 +21,19 @@ services:
     ports:
       - "3001:3001"
     environment:
-      - DATABASE_URL=postgresql://mytaskhub:password@postgres:5432/mytaskhub
+      - DATABASE_URL=postgresql://postgres:password@postgres:5432/mytaskhub
       - JWT_SECRET=your_jwt_secret_key
       - PORT=3001
       - NODE_ENV=development
     depends_on:
       - postgres
     volumes:
-      - ./packages/backend:/app/packages/backend
-      - ./packages/common:/app/packages/common
+      - .:/app
+      - /app/node_modules
       - /app/packages/backend/node_modules
       - /app/packages/common/node_modules
-    command: npm run start:dev --workspace=@mytaskhub/backend
+    working_dir: /app/packages/backend
+    command: npm run start:dev
     networks:
       - mytaskhub-network
 
