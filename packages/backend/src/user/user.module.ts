@@ -2,10 +2,10 @@
 
 import { Module } from "@nestjs/common";
 import { CqrsModule } from "@nestjs/cqrs";
-import { PrismaModule } from "src/prisma/prisma.module";
-import { PrismaUserRepository } from "src/infrastructure/repositories/prisma-user.repository";
-import { UserMapper } from "src/infrastructure/mappers/user.mapper";
-import { USER_REPOSITORY } from "src/domain/user/repositories/user.reposiroty.interface";
+import { PrismaModule } from "../prisma/prisma.module";
+import { PrismaUserRepository } from "../infrastructure/repositories/prisma-user.repository";
+import { UserMapper } from "../infrastructure/mappers/user.mapper";
+import { USER_REPOSITORY } from "../domain/user/repositories/user.reposiroty.interface";
 
 @Module({
   imports: [

@@ -1,7 +1,10 @@
-import { Controller, Get, HttpStatus, Post } from "@nestjs/common";
+import { Controller, Get, HttpStatus, Post, UseGuards } from "@nestjs/common";
 import { ApiResponseWrapper } from "../../common/responses/api-responses";
 import { User } from "../../domain/user/entities/user.entity";
+import { JwtAuthGuard } from "../../infrastructure/authentication/guards/jwt-auth.guard";
+import { Public } from "../../common/decorators/public.decorator";
 
+@UseGuards(JwtAuthGuard)
 @Controller("auth")
 export class AuthController {
   @Get("me")
@@ -19,6 +22,7 @@ export class AuthController {
     return ApiResponseWrapper.success(user, "ユーザー取得が完了しました", HttpStatus.OK);
   }
 
+  @Public()
   @Post("register")
   async register() {
     // TODO: 実際のユーザー取得ロジックを実装
