@@ -1,16 +1,28 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { AuthController } from "./auth.controller";
 import { User } from "../../domain/user/entities/user.entity";
+import { CommandBus } from "@nestjs/cqrs";
+import { RegisterUserDto } from "../../application/auth/dto/register-user.dto";
 
 describe("AuthController", () => {
   let controller: AuthController;
+  let commandBus: jest.Mocked<CommandBus>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [AuthController],
+      providers: [
+        {
+          provide: CommandBus,
+          useValue: {
+            execute: jest.fn(),
+          },
+        },
+      ],
     }).compile();
 
     controller = module.get<AuthController>(AuthController);
+    commandBus = module.get(CommandBus);
   });
 
   it("should be defined", () => {
@@ -30,11 +42,41 @@ describe("AuthController", () => {
 
   describe("register", () => {
     it("should register a new user", async () => {
-      const result = await controller.register();
+      const registerDto: RegisterUserDto = {
+        email: "test@example.com",
+        name: "TestUser",
+        firebaseToken: "valid-firebase-token",
+      };
+
+      const mockUser = User.create(
+        "abcDEFGHIJKLmnopqrSTUVwxYZ123456789",
+        "test@example.com",
+        "TestUser",
+        "a1b2c3d4e5f6g7h8i9j0k1l2m3n4",
+        "https://example.com/avatar.jpg"
+      );
+
+      const mockResult = {
+        user: mockUser,
+        token: "jwt-token",
+      };
+
+      commandBus.execute.mockResolvedValue(mockResult);
+
+      const result = await controller.register(registerDto);
+
       expect(result).toBeDefined();
       expect(result.success).toBe(true);
       expect(result.status).toBe(201);
-      expect(result.data).toBeInstanceOf(User);
+      expect(result.data).toEqual({
+        token: "jwt-token",
+        user: {
+          id: mockUser.id,
+          email: mockUser.email,
+          name: mockUser.name,
+          imageUrl: mockUser.imageUrl,
+        },
+      });
       expect(result.message).toBe("ユーザー登録が完了しました");
     });
   });

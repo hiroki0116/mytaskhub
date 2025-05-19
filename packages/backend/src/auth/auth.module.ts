@@ -15,14 +15,16 @@ import { ConfigModule, ConfigService } from "@nestjs/config";
 import { PrismaUserRepository } from "../infrastructure/repositories/prisma-user.repository";
 import { USER_REPOSITORY } from "../domain/user/repositories/user.reposiroty.interface";
 import { UserMapper } from "../infrastructure/mappers/user.mapper";
+import { FirebaseModule } from "../infrastructure/authentication/firebase/firebase.module";
+import { RegisterUserHandler } from "../application/auth/handlers/register-user.handler";
+import { GoogleLoginHandler } from "../application/auth/handlers/google-login.handler";
 
 @Module({
   imports: [
-    // CQRSパターンを使用するためのモジュール
     CqrsModule,
-    // Prismaを使用するためのモジュール
     PrismaModule,
     PassportModule,
+    FirebaseModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -40,6 +42,8 @@ import { UserMapper } from "../infrastructure/mappers/user.mapper";
     JwtAuthGuard,
     JwtService,
     UserMapper,
+    RegisterUserHandler,
+    GoogleLoginHandler,
     {
       provide: USER_REPOSITORY,
       useClass: PrismaUserRepository,

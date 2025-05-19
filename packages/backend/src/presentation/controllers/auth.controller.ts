@@ -1,18 +1,25 @@
-import { Controller, Get, HttpStatus, Post, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, HttpStatus, Post, UseGuards } from "@nestjs/common";
 import { ApiResponseWrapper } from "../../common/responses/api-responses";
 import { User } from "../../domain/user/entities/user.entity";
 import { JwtAuthGuard } from "../../infrastructure/authentication/guards/jwt-auth.guard";
 import { Public } from "../../common/decorators/public.decorator";
+import { ApiTags } from "@nestjs/swagger";
+import { CommandBus } from "@nestjs/cqrs";
+import { RegisterUserDto } from "../../application/auth/dto/register-user.dto";
+import { RegisterUserCommand } from "../../application/auth/commands/register-user.command";
 
+@ApiTags("認証")
 @UseGuards(JwtAuthGuard)
 @Controller("auth")
 export class AuthController {
+  constructor(private readonly commandBus: CommandBus) {}
+
   @Get("me")
   async getMe() {
     // TODO: 実際のユーザー取得ロジックを実装
     await new Promise((resolve) => setTimeout(resolve, 0));
     const user = User.create(
-      "1234567890",
+      "abcDEFGHIJKLmnopqrSTUVwxYZ1",
       "test@example.com",
       "johndoe",
       "aBcD1234_EfGh5678-IjKlMnOpQr"
@@ -24,18 +31,25 @@ export class AuthController {
 
   @Public()
   @Post("register")
-  async register() {
-    // TODO: 実際のユーザー取得ロジックを実装
-    await new Promise((resolve) => setTimeout(resolve, 0));
-    const user = User.create(
-      "1234567890",
-      "test@example.com",
-      "johndoe",
-      "aBcD1234_EfGh5678-IjKlMnOpQr"
-    );
+  async register(@Body() registerDto: RegisterUserDto) {
+    const { email, name, firebaseToken, password } = registerDto;
 
-    // ApiResponseInterceptorがあればこの明示的な変換は不要になる
-    return ApiResponseWrapper.success(user, "ユーザー登録が完了しました", HttpStatus.CREATED);
+    const result = await this.commandBus.execute(
+      new RegisterUserCommand(email, name, firebaseToken, password)
+    );
+    return ApiResponseWrapper.success(
+      {
+        token: result.token,
+        user: {
+          id: result.user.id,
+          email: result.user.email,
+          name: result.user.name,
+          imageUrl: result.user.imageUrl,
+        },
+      },
+      "ユーザー登録が完了しました",
+      HttpStatus.CREATED
+    );
   }
 
   @Post("login")
@@ -43,7 +57,7 @@ export class AuthController {
     // TODO: 実際のユーザー取得ロジックを実装
     await new Promise((resolve) => setTimeout(resolve, 0));
     const user = User.create(
-      "1234567890",
+      "abcDEFGHIJKLmnopqrSTUVwxYZ1",
       "test@example.com",
       "johndoe",
       "aBcD1234_EfGh5678-IjKlMnOpQr"
@@ -58,7 +72,7 @@ export class AuthController {
     // TODO: 実際のユーザー取得ロジックを実装
     await new Promise((resolve) => setTimeout(resolve, 0));
     const user = User.create(
-      "1234567890",
+      "abcDEFGHIJKLmnopqrSTUVwxYZ1",
       "test@example.com",
       "johndoe",
       "aBcD1234_EfGh5678-IjKlMnOpQr"

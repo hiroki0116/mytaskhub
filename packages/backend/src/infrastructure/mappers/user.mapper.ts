@@ -4,23 +4,33 @@ import { User } from "../../domain/user/entities/user.entity";
 
 @Injectable()
 export class UserMapper {
+  /**
+   * Prismaのユーザーをドメインのユーザーに変換
+   * @param prismaUser Prismaのユーザー
+   * @returns ドメインのユーザー
+   */
   toDomain(prismaUser: PrismaUser): User {
     return User.create(
-      prismaUser.id as string,
-      prismaUser.email as string,
-      prismaUser.name as string,
-      prismaUser.firebaseUid as string,
-      prismaUser.imageUrl as string
+      prismaUser.id,
+      prismaUser.email,
+      prismaUser.name,
+      prismaUser.firebaseUid,
+      prismaUser.imageUrl ?? undefined
     );
   }
 
+  /**
+   * ドメインのユーザーをPrismaのユーザーに変換
+   * @param user ドメインのユーザー
+   * @returns Prismaのユーザー
+   */
   toPersistence(user: User): Omit<PrismaUser, "createdAt" | "updatedAt"> {
     return {
       id: user.id,
       email: user.email,
       name: user.name,
       firebaseUid: user.firebaseUid,
-      imageUrl: user.imageUrl,
+      imageUrl: user.imageUrl ?? null,
     };
   }
 }

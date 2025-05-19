@@ -8,12 +8,7 @@ import { UserMapper } from "../infrastructure/mappers/user.mapper";
 import { USER_REPOSITORY } from "../domain/user/repositories/user.reposiroty.interface";
 
 @Module({
-  imports: [
-    // CQRSパターンを使用するためのモジュール
-    CqrsModule,
-    // Prismaを使用するためのモジュール
-    PrismaModule,
-  ],
+  imports: [CqrsModule, PrismaModule],
   controllers: [],
   providers: [
     UserMapper,
