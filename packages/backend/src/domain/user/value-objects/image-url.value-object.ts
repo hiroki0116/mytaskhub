@@ -5,7 +5,7 @@ export class ImageUrl {
     this.value = value;
   }
 
-  public static create(url: string | undefined | null): ImageUrl | null {
+  public static create(url: string | null | undefined): ImageUrl | null {
     if (url === undefined || url === null || url.trim() === "") {
       return null;
     }

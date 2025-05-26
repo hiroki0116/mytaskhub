@@ -11,7 +11,7 @@ export class User extends AggregateRoot {
     private readonly _email: Email,
     private readonly _name: UserName,
     private readonly _firebaseUid: FirebaseUid,
-    private readonly _imageUrl: ImageUrl | null,
+    private readonly _imageUrl?: ImageUrl,
     private readonly _createdAt: Date = new Date(),
     private readonly _updatedAt: Date = new Date()
   ) {
@@ -35,7 +35,7 @@ export class User extends AggregateRoot {
   }
 
   get imageUrl(): string | null {
-    return this._imageUrl?.getValue() ?? null;
+    return this._imageUrl ? this._imageUrl.getValue() : null;
   }
 
   get createdAt(): Date {
@@ -48,21 +48,21 @@ export class User extends AggregateRoot {
 
   /**
    * ファクトリーメソッド
-   * ファイヤーベース認証を使用してユーザーを作成する
+   * firebase認証を使用してユーザーを作成する
    */
   static create(
     id: string,
     email: string,
     name: string,
     firebaseUid: string,
-    imageUrl?: string
+    imageUrl?: string | null
   ): User {
     return new User(
       UserId.create(id),
       Email.create(email),
       UserName.create(name),
       FirebaseUid.create(firebaseUid),
-      imageUrl ? ImageUrl.create(imageUrl) : null
+      imageUrl ? ImageUrl.create(imageUrl) || undefined : undefined
     );
   }
 

@@ -13,7 +13,8 @@ export class UserId {
   }
 
   public static isValid(userId: string): boolean {
-    const userIdRegex = /^[a-zA-Z0-9_-]{1,20}$/;
+    // cuid()は通常25文字程度で、英数字と一部の特殊文字を含む
+    const userIdRegex = /^[a-zA-Z0-9_-]{25,}$/;
     return userIdRegex.test(userId);
   }
 
