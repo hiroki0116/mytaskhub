@@ -1,44 +1,51 @@
 import { Body, Controller, Get, HttpStatus, Post, UseGuards } from "@nestjs/common";
 import { ApiResponseWrapper } from "../../common/responses/api-responses";
-import { User } from "../../domain/user/entities/user.entity";
 import { JwtAuthGuard } from "../../infrastructure/authentication/guards/jwt-auth.guard";
 import { Public } from "../../common/decorators/public.decorator";
 import { ApiTags } from "@nestjs/swagger";
-import { CommandBus } from "@nestjs/cqrs";
+import { CommandBus, QueryBus } from "@nestjs/cqrs";
 import { RegisterUserDto } from "../../application/auth/dto/register-user.dto";
 import { RegisterUserCommand } from "../../application/auth/commands/register-user.command";
 import { LoginUserCommand } from "../../application/auth/commands/login-user.command";
 import { LoginDto } from "../../application/auth/dto/login.dto";
+import { ApiResponse } from "../../common/interfaces/api-response.interface";
+import { CurrentUserResponseDto } from "../../application/auth/dto/responses/current-user.response.dto";
+import { CurrentUser } from "../../common/decorators/current-user.decorator";
+import { User } from "../../domain/user/entities/user.entity";
+import { GetCurrentUserQuery } from "../../application/auth/queries/get-current-user.query";
+import { RegisterUserResponseDto } from "../../application/auth/dto/responses/register-user.response.dto";
+import { LoginUserResponseDto } from "../../application/auth/dto/responses/login-user.response.dto";
 
 @ApiTags("認証")
 @UseGuards(JwtAuthGuard)
 @Controller("auth")
 export class AuthController {
-  constructor(private readonly commandBus: CommandBus) {}
+  constructor(
+    private readonly commandBus: CommandBus,
+    private readonly queryBus: QueryBus
+  ) {}
 
   @Get("me")
-  async getMe() {
-    // TODO: 実際のユーザー取得ロジックを実装
-    await new Promise((resolve) => setTimeout(resolve, 0));
-    const user = User.create(
-      "abcDEFGHIJKLmnopqrSTUVwxYZ1",
-      "test@example.com",
-      "johndoe",
-      "aBcD1234_EfGh5678-IjKlMnOpQr"
-    );
+  async getMe(@CurrentUser() user: User): Promise<ApiResponse<CurrentUserResponseDto>> {
+    const { id } = user;
 
-    // ApiResponseInterceptorがあればこの明示的な変換は不要になる
-    return ApiResponseWrapper.success(user, "ユーザー取得が完了しました", HttpStatus.OK);
+    const userData = await this.queryBus.execute<GetCurrentUserQuery, CurrentUserResponseDto>(
+      new GetCurrentUserQuery(id)
+    );
+    return ApiResponseWrapper.success(userData, "ユーザー取得が完了しました", HttpStatus.OK);
   }
 
   @Public()
   @Post("register")
-  async register(@Body() registerDto: RegisterUserDto) {
+  async register(
+    @Body() registerDto: RegisterUserDto
+  ): Promise<ApiResponse<RegisterUserResponseDto>> {
     const { email, name, firebaseToken, password } = registerDto;
 
-    const result = await this.commandBus.execute(
+    const result = await this.commandBus.execute<RegisterUserCommand, RegisterUserResponseDto>(
       new RegisterUserCommand(email, name, firebaseToken, password)
     );
+
     return ApiResponseWrapper.success(
       {
         token: result.token,
@@ -59,7 +66,9 @@ export class AuthController {
   async login(@Body() loginDto: LoginDto) {
     const { firebaseToken } = loginDto;
 
-    const result = await this.commandBus.execute(new LoginUserCommand(firebaseToken));
+    const result = await this.commandBus.execute<LoginUserCommand, LoginUserResponseDto>(
+      new LoginUserCommand(firebaseToken)
+    );
 
     return ApiResponseWrapper.success(
       {
