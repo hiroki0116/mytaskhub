@@ -75,19 +75,4 @@ export class AuthController {
       HttpStatus.OK
     );
   }
-
-  @Post("google-login")
-  async googleLogin() {
-    // TODO: 実際のユーザー取得ロジックを実装
-    await new Promise((resolve) => setTimeout(resolve, 0));
-    const user = User.create(
-      "abcDEFGHIJKLmnopqrSTUVwxYZ1",
-      "test@example.com",
-      "johndoe",
-      "aBcD1234_EfGh5678-IjKlMnOpQr"
-    );
-
-    // ApiResponseInterceptorがあればこの明示的な変換は不要になる
-    return ApiResponseWrapper.success(user, "Googleログインに成功しました", HttpStatus.OK);
-  }
 }

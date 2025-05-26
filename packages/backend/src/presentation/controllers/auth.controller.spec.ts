@@ -114,15 +114,4 @@ describe("AuthController", () => {
       expect(result.message).toBe("ログインに成功しました");
     });
   });
-
-  describe("googleLogin", () => {
-    it("should login with Google", async () => {
-      const result = await controller.googleLogin();
-      expect(result).toBeDefined();
-      expect(result.success).toBe(true);
-      expect(result.status).toBe(200);
-      expect(result.data).toBeInstanceOf(User);
-      expect(result.message).toBe("Googleログインに成功しました");
-    });
-  });
 });
