@@ -83,11 +83,34 @@ describe("AuthController", () => {
 
   describe("login", () => {
     it("should login user", async () => {
-      const result = await controller.login();
+      const mockUser = User.create(
+        "abcDEFGHIJKLmnopqrSTUVwxYZ123456789",
+        "test@example.com",
+        "TestUser",
+        "a1b2c3d4e5f6g7h8i9j0k1l2m3n4",
+        "https://example.com/avatar.jpg"
+      );
+
+      const mockResult = {
+        user: mockUser,
+        token: "jwt-token",
+      };
+
+      commandBus.execute.mockResolvedValue(mockResult);
+
+      const result = await controller.login({ firebaseToken: "valid-firebase-token" });
       expect(result).toBeDefined();
       expect(result.success).toBe(true);
       expect(result.status).toBe(200);
-      expect(result.data).toBeInstanceOf(User);
+      expect(result.data).toEqual({
+        user: {
+          id: mockUser.id,
+          email: mockUser.email,
+          name: mockUser.name,
+          imageUrl: mockUser.imageUrl,
+        },
+        token: "jwt-token",
+      });
       expect(result.message).toBe("ログインに成功しました");
     });
   });

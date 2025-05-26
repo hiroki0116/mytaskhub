@@ -1,21 +1,22 @@
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
 import { RegisterUserCommand } from "../commands/register-user.command";
 import {
-  BadRequestException,
-  ConflictException,
-  Inject,
-  InternalServerErrorException,
-} from "@nestjs/common";
-import {
   IUserRepository,
   USER_REPOSITORY,
 } from "../../../domain/user/repositories/user.reposiroty.interface";
 import {
+  Inject,
+  BadRequestException,
+  ConflictException,
+  InternalServerErrorException,
+  Logger,
+} from "@nestjs/common";
+import {
   FirebaseAuthService,
   FirebaseUserInfo,
 } from "../../../infrastructure/authentication/firebase/firebase.service";
-import { JwtService } from "../../../infrastructure/authentication/jwt/jwt.service";
 import { User } from "../../../domain/user/entities/user.entity";
+import { JwtService } from "../../../infrastructure/authentication/jwt/jwt.service";
 import { v4 as uuidv4 } from "uuid";
 
 /**
@@ -23,6 +24,8 @@ import { v4 as uuidv4 } from "uuid";
  */
 @CommandHandler(RegisterUserCommand)
 export class RegisterUserHandler implements ICommandHandler<RegisterUserCommand> {
+  private readonly logger = new Logger(RegisterUserHandler.name);
+
   constructor(
     @Inject(USER_REPOSITORY)
     private readonly userRepository: IUserRepository,
@@ -32,6 +35,7 @@ export class RegisterUserHandler implements ICommandHandler<RegisterUserCommand>
 
   async execute(command: RegisterUserCommand): Promise<{ user: User; token: string }> {
     const { email, name, firebaseToken, password } = command;
+
     try {
       let firebaseUser: FirebaseUserInfo | null = null;
 
@@ -44,9 +48,6 @@ export class RegisterUserHandler implements ICommandHandler<RegisterUserCommand>
       if (firebaseToken) {
         // Firebase トークンを検証
         firebaseUser = await this.firebaseAuthService.verifyToken(firebaseToken);
-        if (!firebaseUser) {
-          throw new BadRequestException("無効なFirebaseトークンです");
-        }
       }
 
       // パスワード認証を使用してユーザーを作成
@@ -93,21 +94,16 @@ export class RegisterUserHandler implements ICommandHandler<RegisterUserCommand>
 
       return { user: savedUser, token };
     } catch (error) {
-      // Firebase認証エラーの変換
-      if (error.code) {
-        switch (error.code) {
-          case "auth/email-already-exists":
-          case "auth/email-already-in-use":
-            throw new ConflictException("このメールアドレスは既に使用されています");
-          case "auth/invalid-email":
-            throw new BadRequestException("無効なメールアドレス形式です");
-          case "auth/weak-password":
-            throw new BadRequestException("パスワードが弱すぎます。6文字以上にしてください");
-          default:
-            throw new InternalServerErrorException(`認証エラー: ${error.message}`);
-        }
+      if (
+        error instanceof BadRequestException ||
+        error instanceof ConflictException ||
+        error instanceof InternalServerErrorException
+      ) {
+        throw error;
       }
-      throw error;
+
+      this.logger.error(`予期せぬエラー: ${JSON.stringify(error)}`);
+      throw new InternalServerErrorException("ユーザー登録処理中にエラーが発生しました");
     }
   }
 }

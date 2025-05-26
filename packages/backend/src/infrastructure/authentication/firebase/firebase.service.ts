@@ -1,4 +1,11 @@
-import { Injectable, Logger } from "@nestjs/common";
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+  UnauthorizedException,
+} from "@nestjs/common";
 import * as admin from "firebase-admin";
 
 export interface FirebaseUserInfo {
@@ -16,7 +23,7 @@ export class FirebaseAuthService {
   /**
    * Firebaseトークンを検証し、ユーザー情報を取得
    */
-  async verifyToken(token: string): Promise<FirebaseUserInfo | null> {
+  async verifyToken(token: string): Promise<FirebaseUserInfo> {
     try {
       const decodedToken = await admin.auth().verifyIdToken(token);
 
@@ -32,7 +39,18 @@ export class FirebaseAuthService {
       };
     } catch (error) {
       this.logger.error(`Firebase verifyTokenにてエラー: ${error.message}`);
-      return null;
+
+      switch (error.code) {
+        case "auth/token-expired":
+          throw new UnauthorizedException("トークンの有効期限が切れています");
+        case "auth/user-disabled":
+          throw new UnauthorizedException("アカウントが無効化されています");
+        case "auth/argument-error":
+        case "auth/invalid-token":
+          throw new UnauthorizedException("無効なfirebaseトークンです");
+        default:
+          throw new UnauthorizedException("認証に失敗しました");
+      }
     }
   }
 
@@ -60,7 +78,20 @@ export class FirebaseAuthService {
         emailVerified: userRecord.emailVerified,
       };
     } catch (error) {
-      this.logger.error(`Firebase user creation error: ${error.message}`, error.stack);
+      if (error.code) {
+        switch (error.code) {
+          case "auth/email-already-exists":
+          case "auth/email-already-in-use":
+            throw new ConflictException("このメールアドレスは既に使用されています");
+          case "auth/invalid-email":
+            throw new BadRequestException("無効なメールアドレス形式です");
+          case "auth/weak-password":
+            throw new BadRequestException("パスワードが弱すぎます。6文字以上にしてください");
+          default:
+            throw new InternalServerErrorException(`認証エラー: ${error.message}`);
+        }
+      }
+      this.logger.error(`Firebase user creation error: ${JSON.stringify(error)}`);
       throw error;
     }
   }

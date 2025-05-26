@@ -7,6 +7,8 @@ import { ApiTags } from "@nestjs/swagger";
 import { CommandBus } from "@nestjs/cqrs";
 import { RegisterUserDto } from "../../application/auth/dto/register-user.dto";
 import { RegisterUserCommand } from "../../application/auth/commands/register-user.command";
+import { LoginUserCommand } from "../../application/auth/commands/login-user.command";
+import { LoginDto } from "../../application/auth/dto/login.dto";
 
 @ApiTags("認証")
 @UseGuards(JwtAuthGuard)
@@ -52,19 +54,26 @@ export class AuthController {
     );
   }
 
+  @Public()
   @Post("login")
-  async login() {
-    // TODO: 実際のユーザー取得ロジックを実装
-    await new Promise((resolve) => setTimeout(resolve, 0));
-    const user = User.create(
-      "abcDEFGHIJKLmnopqrSTUVwxYZ1",
-      "test@example.com",
-      "johndoe",
-      "aBcD1234_EfGh5678-IjKlMnOpQr"
-    );
+  async login(@Body() loginDto: LoginDto) {
+    const { firebaseToken } = loginDto;
 
-    // ApiResponseInterceptorがあればこの明示的な変換は不要になる
-    return ApiResponseWrapper.success(user, "ログインに成功しました", HttpStatus.OK);
+    const result = await this.commandBus.execute(new LoginUserCommand(firebaseToken));
+
+    return ApiResponseWrapper.success(
+      {
+        user: {
+          id: result.user.id,
+          email: result.user.email,
+          name: result.user.name,
+          imageUrl: result.user.imageUrl,
+        },
+        token: result.token,
+      },
+      "ログインに成功しました",
+      HttpStatus.OK
+    );
   }
 
   @Post("google-login")

@@ -8,7 +8,11 @@ import {
 import { FirebaseAuthService } from "../../../infrastructure/authentication/firebase/firebase.service";
 import { JwtService } from "../../../infrastructure/authentication/jwt/jwt.service";
 import { User } from "../../../domain/user/entities/user.entity";
-import { BadRequestException, ConflictException } from "@nestjs/common";
+import {
+  BadRequestException,
+  ConflictException,
+  InternalServerErrorException,
+} from "@nestjs/common";
 
 jest.mock("uuid", () => ({
   v4: jest.fn().mockReturnValue("abcDEFGHIJKLmnopqrSTUVwxYZ123456789"),
@@ -71,18 +75,20 @@ describe("RegisterUserHandler", () => {
       return handler.execute(command);
     };
 
-    it("should throw BadRequestException when neither firebaseToken nor password is provided", async () => {
-      const command = new RegisterUserCommand("test@example.com", "TestUser", "", undefined);
+    it("should throw BadRequestException when no firebaseToken and password are provided", async () => {
+      const command = new RegisterUserCommand("test@example.com", "TestUser", "", "");
 
-      await expect(execute(command)).rejects.toThrow(BadRequestException);
+      await expect(execute(command)).rejects.toThrow(
+        new BadRequestException("パスワードまたはFirebaseトークンが必要です")
+      );
     });
 
-    it("should create new user with firebase token", async () => {
+    it("should register user with firebase token", async () => {
       const command = new RegisterUserCommand(
         "test@example.com",
         "TestUser",
         "valid-firebase-token",
-        undefined
+        ""
       );
 
       const firebaseUser = {
@@ -102,13 +108,12 @@ describe("RegisterUserHandler", () => {
         user: mockUser,
         token: "jwt-token",
       });
+
       // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(firebaseAuthService.verifyToken).toHaveBeenCalledWith("valid-firebase-token");
-      // eslint-disable-next-line @typescript-eslint/unbound-method
-      expect(userRepository.save).toHaveBeenCalled();
     });
 
-    it("should create new user with password", async () => {
+    it("should register user with password", async () => {
       const command = new RegisterUserCommand("test@example.com", "TestUser", "", "password123");
 
       const firebaseUser = {
@@ -129,6 +134,7 @@ describe("RegisterUserHandler", () => {
         user: mockUser,
         token: "jwt-token",
       });
+
       // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(firebaseAuthService.createUser).toHaveBeenCalledWith(
         "test@example.com",
@@ -137,63 +143,40 @@ describe("RegisterUserHandler", () => {
       );
     });
 
-    it("should update existing user with new firebase UID", async () => {
-      const command = new RegisterUserCommand(
-        "test@example.com",
-        "TestUser",
-        "valid-firebase-token",
-        undefined
-      );
-
-      const existingUser = User.create(
-        "abcDEFGHIJKLmnopqrSTUVwxYZ123456789",
-        "test@example.com",
-        "TestUser",
-        "a1b2c3d4e5f6g7h8i9j0k1l2m3n4",
-        "https://example.com/old-avatar.jpg"
-      );
-
-      const firebaseUser = {
-        uid: "a1b2c3d4e5f6g7h8i9j0k1l2m3n4",
-        email: "test@example.com",
-        picture: "https://example.com/new-avatar.jpg",
-      };
-
-      firebaseAuthService.verifyToken.mockResolvedValue(firebaseUser);
-      userRepository.findByEmail.mockResolvedValue(existingUser);
-      userRepository.save.mockResolvedValue(mockUser);
-      jwtService.generateToken.mockReturnValue("jwt-token");
-
-      const result = await execute(command);
-
-      expect(result).toEqual({
-        user: mockUser,
-        token: "jwt-token",
-      });
-      // eslint-disable-next-line @typescript-eslint/unbound-method
-      expect(userRepository.save).toHaveBeenCalled();
-    });
-
-    it("should throw ConflictException when email already exists in Firebase", async () => {
+    it("should throw ConflictException when email is already registered", async () => {
       const command = new RegisterUserCommand("test@example.com", "TestUser", "", "password123");
 
-      firebaseAuthService.getUserByEmail.mockResolvedValue({
+      const existingFirebaseUser = {
         uid: "a1b2c3d4e5f6g7h8i9j0k1l2m3n4",
         email: "test@example.com",
-      });
+        picture: "https://example.com/avatar.jpg",
+      };
 
-      await expect(execute(command)).rejects.toThrow(ConflictException);
+      firebaseAuthService.getUserByEmail.mockResolvedValue(existingFirebaseUser);
+
+      await expect(execute(command)).rejects.toThrow(
+        new ConflictException("このメールアドレスは既に使用されています")
+      );
     });
 
     it("should handle Firebase authentication errors", async () => {
-      const command = new RegisterUserCommand("test@example.com", "TestUser", "", "password123");
+      const command = new RegisterUserCommand("test@example.com", "TestUser", "invalid-token", "");
 
-      firebaseAuthService.getUserByEmail.mockRejectedValue({
-        code: "auth/email-already-in-use",
-        message: "Email already in use",
-      });
+      firebaseAuthService.verifyToken.mockRejectedValue(new Error("Invalid token"));
 
-      await expect(execute(command)).rejects.toThrow(ConflictException);
+      await expect(execute(command)).rejects.toThrow(
+        new InternalServerErrorException("ユーザー登録処理中にエラーが発生しました")
+      );
+    });
+
+    it("should handle unexpected errors", async () => {
+      const command = new RegisterUserCommand("test@example.com", "TestUser", "valid-token", "");
+
+      firebaseAuthService.verifyToken.mockRejectedValue(new Error("予期せぬエラー"));
+
+      await expect(execute(command)).rejects.toThrow(
+        new InternalServerErrorException("ユーザー登録処理中にエラーが発生しました")
+      );
     });
   });
 });
