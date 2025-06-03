@@ -17,7 +17,6 @@ import { USER_REPOSITORY } from "../domain/user/repositories/user.reposiroty.int
 import { UserMapper } from "../infrastructure/mappers/user.mapper";
 import { FirebaseModule } from "../infrastructure/authentication/firebase/firebase.module";
 import { RegisterUserHandler } from "../application/auth/handlers/register-user.handler";
-import { GoogleLoginHandler } from "../application/auth/handlers/google-login.handler";
 import { LoginUserHandler } from "../application/auth/handlers/login-user.handler";
 
 @Module({
@@ -44,7 +43,6 @@ import { LoginUserHandler } from "../application/auth/handlers/login-user.handle
     JwtService,
     UserMapper,
     RegisterUserHandler,
-    GoogleLoginHandler,
     LoginUserHandler,
     {
       provide: USER_REPOSITORY,

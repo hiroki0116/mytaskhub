@@ -1,5 +1,3 @@
-// src/user/user.module.ts
-
 import { Module } from "@nestjs/common";
 import { CqrsModule } from "@nestjs/cqrs";
 import { PrismaModule } from "../prisma/prisma.module";
