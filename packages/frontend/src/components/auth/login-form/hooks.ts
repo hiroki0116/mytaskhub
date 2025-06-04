@@ -4,9 +4,9 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { loginSchema } from "@/lib/validations";
-import { login } from "@/lib/api";
-import { setAuth } from "@/lib/auth";
+import { loginSchema } from "@/lib/validations/auth/validations";
+import { login } from "@/lib/api/auth/api";
+import { setAuth } from "@/lib/auth/auth";
 import {
   showSuccessToast,
   showErrorToast,

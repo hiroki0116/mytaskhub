@@ -1,6 +1,10 @@
 import { ApiResponse } from "@/types/api";
-import { AuthResponse, LoginRequest, RegisterRequest } from "../types/auth";
-import { FirebaseAuthService } from "./firebaseAuth";
+import {
+  AuthResponse,
+  LoginRequest,
+  RegisterRequest,
+} from "../../../types/auth";
+import { FirebaseAuthService } from "../../external/firebaseAuth";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 

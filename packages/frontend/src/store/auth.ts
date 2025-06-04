@@ -1,6 +1,6 @@
 import { atom } from "jotai";
 import { User } from "@/types/auth";
-import { getUser } from "@/lib/auth";
+import { getUser } from "@/lib/auth/auth";
 
 export const userAtom = atom<User | null>(getUser());
 
