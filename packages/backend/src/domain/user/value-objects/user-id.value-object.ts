@@ -1,6 +1,6 @@
 export class UserId {
   private readonly value: string;
-  private constructor(value: string) {
+  constructor(value: string) {
     this.value = value;
   }
 

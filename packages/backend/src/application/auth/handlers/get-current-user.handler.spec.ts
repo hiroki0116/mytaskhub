@@ -1,5 +1,4 @@
 import { Test, TestingModule } from "@nestjs/testing";
-import { GetCurrentUserHandler } from "./get-current-user.handler";
 import { GetCurrentUserQuery } from "../queries/get-current-user.query";
 import {
   IUserRepository,
@@ -7,9 +6,10 @@ import {
 } from "../../../domain/user/repositories/user.reposiroty.interface";
 import { User } from "../../../domain/user/entities/user.entity";
 import { NotFoundException } from "@nestjs/common";
+import { GetCurrentUserQueryHandler } from "./get-current-user.handler";
 
 describe("GetCurrentUserHandler", () => {
-  let handler: GetCurrentUserHandler;
+  let handler: GetCurrentUserQueryHandler;
   let userRepository: jest.Mocked<IUserRepository>;
 
   const mockUser = User.create(
@@ -23,7 +23,7 @@ describe("GetCurrentUserHandler", () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        GetCurrentUserHandler,
+        GetCurrentUserQueryHandler,
         {
           provide: USER_REPOSITORY,
           useValue: {
@@ -33,7 +33,7 @@ describe("GetCurrentUserHandler", () => {
       ],
     }).compile();
 
-    handler = module.get<GetCurrentUserHandler>(GetCurrentUserHandler);
+    handler = module.get<GetCurrentUserQueryHandler>(GetCurrentUserQueryHandler);
     userRepository = module.get(USER_REPOSITORY);
   });
 
