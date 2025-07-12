@@ -7,6 +7,7 @@ import { GlobalExceptionFilter } from "./common/filters/global-exception.filter"
 import { AuthModule } from "./auth/auth.module";
 import { ApiResponseInterceptor } from "./common/interceptors/api-response.interceptor";
 import { TaskModule } from "./task/task.module";
+import { ProjectModule } from "./project/project.module";
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -16,6 +17,7 @@ import { TaskModule } from "./task/task.module";
     AuthModule,
     UserModule,
     TaskModule,
+    ProjectModule,
   ],
   controllers: [],
   providers: [
