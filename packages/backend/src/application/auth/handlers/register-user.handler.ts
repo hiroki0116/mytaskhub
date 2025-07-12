@@ -94,15 +94,15 @@ export class RegisterUserHandler implements ICommandHandler<RegisterUserCommand>
 
       return { user: savedUser, token };
     } catch (error) {
-      if (
-        error instanceof BadRequestException ||
-        error instanceof ConflictException ||
-        error instanceof InternalServerErrorException
-      ) {
+      if (error instanceof BadRequestException || error instanceof ConflictException) {
         throw error;
       }
 
-      this.logger.error(`予期せぬエラー: ${JSON.stringify(error)}`);
+      this.logger.error(
+        `予期せぬエラー: ${error.message || "不明なエラー"}`,
+        error.stack,
+        "RegisterUserHandler"
+      );
       throw new InternalServerErrorException("ユーザー登録処理中にエラーが発生しました");
     }
   }

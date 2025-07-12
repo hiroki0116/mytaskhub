@@ -11,7 +11,7 @@ import {
   InternalServerErrorException,
 } from "@nestjs/common";
 import { FirebaseAuthService } from "../../../infrastructure/authentication/firebase/firebase.service";
-import { User } from "src/domain/user/entities/user.entity";
+import { User } from "../../../domain/user/entities/user.entity";
 import { JwtService } from "../../../infrastructure/authentication/jwt/jwt.service";
 
 @CommandHandler(LoginUserCommand)

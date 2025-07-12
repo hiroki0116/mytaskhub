@@ -1,4 +1,4 @@
-import { IQueryHandler } from "@nestjs/cqrs";
+import { IQueryHandler, QueryHandler } from "@nestjs/cqrs";
 import { GetCurrentUserQuery } from "../queries/get-current-user.query";
 import { GetCurrentUserResponseDto } from "../dto/responses/get-current-user-response.dto";
 import {
@@ -7,7 +7,8 @@ import {
 } from "../../../domain/user/repositories/user.reposiroty.interface";
 import { NotFoundException, Inject } from "@nestjs/common";
 
-export class GetCurrentUserHandler implements IQueryHandler<GetCurrentUserQuery> {
+@QueryHandler(GetCurrentUserQuery)
+export class GetCurrentUserQueryHandler implements IQueryHandler<GetCurrentUserQuery> {
   constructor(
     @Inject(USER_REPOSITORY)
     private readonly userRepository: IUserRepository

@@ -6,6 +6,7 @@ import { APP_FILTER, APP_INTERCEPTOR } from "@nestjs/core";
 import { GlobalExceptionFilter } from "./common/filters/global-exception.filter";
 import { AuthModule } from "./auth/auth.module";
 import { ApiResponseInterceptor } from "./common/interceptors/api-response.interceptor";
+import { TaskModule } from "./task/task.module";
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -14,6 +15,7 @@ import { ApiResponseInterceptor } from "./common/interceptors/api-response.inter
     PrismaModule,
     AuthModule,
     UserModule,
+    TaskModule,
   ],
   controllers: [],
   providers: [
