@@ -94,11 +94,7 @@ export class RegisterUserHandler implements ICommandHandler<RegisterUserCommand>
 
       return { user: savedUser, token };
     } catch (error) {
-      if (
-        error instanceof BadRequestException ||
-        error instanceof ConflictException ||
-        error instanceof InternalServerErrorException
-      ) {
+      if (error instanceof BadRequestException || error instanceof ConflictException) {
         throw error;
       }
 

@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
 import { DeleteTaskCommand } from "../commands/delete-task.command";
-import { Inject } from "@nestjs/common";
+import { Inject, NotFoundException } from "@nestjs/common";
 import {
   TASK_REPOSITORY,
   ITaskRepository,
@@ -15,6 +15,12 @@ export class DeleteTaskHandler implements ICommandHandler<DeleteTaskCommand> {
 
   async execute(command: DeleteTaskCommand): Promise<void> {
     const { id, userId } = command;
+
+    // 削除前にタスクの存在確認
+    const existingTask = await this.taskRepository.findById(id, userId);
+    if (!existingTask) {
+      throw new NotFoundException(`タスクが見つかりません`);
+    }
 
     await this.taskRepository.delete(id, userId);
   }

@@ -3,7 +3,7 @@ import { CreateTaskCommand } from "../commands/create-task.command";
 import {
   ITaskRepository,
   TASK_REPOSITORY,
-} from "src/domain/task/repositories/task.repository.interface";
+} from "../../../domain/task/repositories/task.repository.interface";
 import { Inject } from "@nestjs/common";
 import { TaskResponseDto } from "../dto/responses/task.response.dto";
 import { Task } from "../../../domain/task/entities/task.entity";
@@ -18,6 +18,7 @@ export class CreateTaskHandler implements ICommandHandler<CreateTaskCommand> {
 
   async execute(command: CreateTaskCommand): Promise<TaskResponseDto> {
     const { userId, createTaskDto } = command;
+
     const task = await this.taskRepository.save(
       Task.create(
         uuidv4(),

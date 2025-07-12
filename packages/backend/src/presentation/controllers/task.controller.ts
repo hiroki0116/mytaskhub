@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Put, Delete, HttpStatus, Param, Body } from "@nestjs/common";
 import { CommandBus, QueryBus } from "@nestjs/cqrs";
 import { ApiTags } from "@nestjs/swagger";
-import { TaskResponseDto } from "src/application/task/dto/responses/task.response.dto";
+import { TaskResponseDto } from "../../application/task/dto/responses/task.response.dto";
 import { ApiResponse } from "../../common/interfaces/api-response.interface";
 import { ApiResponseWrapper } from "../../common/responses/api-responses";
 import { CreateTaskDto } from "../../application/task/dto/create-task.dto";

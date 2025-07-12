@@ -1,5 +1,5 @@
 import { Module } from "@nestjs/common";
-import { TaskMapper } from "src/infrastructure/mappers/task.mapper";
+import { TaskMapper } from "../infrastructure/mappers/task.mapper";
 import { CqrsModule } from "@nestjs/cqrs";
 import { PrismaModule } from "../prisma/prisma.module";
 import { PrismaTaskReposiroty } from "../infrastructure/repositories/prisma-task.repository";

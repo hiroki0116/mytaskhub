@@ -31,10 +31,6 @@ export class UpdateTaskHandler implements ICommandHandler<UpdateTaskCommand> {
       )
     );
 
-    if (!task) {
-      throw new Error("タスクの更新に失敗しました");
-    }
-
     return TaskResponseDto.fromEntity(task);
   }
 }

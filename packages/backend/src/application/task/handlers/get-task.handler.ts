@@ -3,7 +3,7 @@ import { GetTaskQuery } from "../queries/get-task.query";
 import {
   ITaskRepository,
   TASK_REPOSITORY,
-} from "src/domain/task/repositories/task.repository.interface";
+} from "../../../domain/task/repositories/task.repository.interface";
 import { TaskResponseDto } from "../dto/responses/task.response.dto";
 import { Inject, NotFoundException } from "@nestjs/common";
 
