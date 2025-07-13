@@ -1,9 +1,5 @@
 export class TaskId {
-  private readonly value: string;
-
-  constructor(value: string) {
-    this.value = value;
-  }
+  constructor(private readonly value: string) {}
 
   public static create(taskId: string): TaskId {
     if (!TaskId.isValid(taskId)) {
@@ -15,8 +11,8 @@ export class TaskId {
 
   public static isValid(taskId: string): boolean {
     // cuid()は通常25文字程度で、英数字と一部の特殊文字を含む
-    const userIdRegex = /^[a-zA-Z0-9_\- ]{25,}$/;
-    return userIdRegex.test(taskId);
+    const taskIdRegex = /^[a-zA-Z0-9_\- ]{25,}$/;
+    return taskIdRegex.test(taskId);
   }
 
   public getValue(): string {

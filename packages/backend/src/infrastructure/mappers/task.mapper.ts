@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { Task } from "../../domain/task/entities/task.entity";
-import { Task as PrismaTask } from "@prisma/client";
+import { Task as PrismaTask, TaskStatus } from "@prisma/client";
 import { TaskStatusEnum } from "../../domain/task/value-objects/task-status.value-object";
 import { PriorityEnum } from "../../domain/task/value-objects/task-priority.value-object";
 
@@ -24,7 +24,7 @@ export class TaskMapper {
       id: task.id,
       title: task.title,
       content: task.content,
-      status: task.status as any,
+      status: task.status as TaskStatus,
       priority: task.priority,
       deadline: task.deadline,
       completedAt: task.completedAt,

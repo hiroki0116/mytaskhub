@@ -1,8 +1,5 @@
 export class TaskTitle {
-  private readonly value: string;
-  constructor(value: string) {
-    this.value = value;
-  }
+  constructor(private readonly value: string) {}
 
   public static create(title: string): TaskTitle {
     if (!TaskTitle.isValid(title)) {

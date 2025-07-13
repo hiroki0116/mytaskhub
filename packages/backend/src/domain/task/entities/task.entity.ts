@@ -5,6 +5,7 @@ import { TaskStatus, TaskStatusEnum } from "../value-objects/task-status.value-o
 import { TaskPriority, PriorityEnum } from "../value-objects/task-priority.value-object";
 import { UserId } from "../../../domain/user/value-objects/user-id.value-object";
 import { TaskContent } from "../value-objects/task-content.value-object";
+import { ProjectId } from "../../../domain/project/value-objects/project-id.value-object";
 
 export class Task extends AggregateRoot {
   constructor(
@@ -12,7 +13,7 @@ export class Task extends AggregateRoot {
     private readonly _title: TaskTitle,
     private readonly _status: TaskStatus,
     private readonly _priority: TaskPriority,
-    private readonly _projectId: string, //TODO: ProjectIdを追加
+    private readonly _projectId: ProjectId,
     private readonly _userId: UserId,
     private readonly _content?: TaskContent,
     private readonly _deadline?: Date,
@@ -52,7 +53,7 @@ export class Task extends AggregateRoot {
   }
 
   get projectId(): string {
-    return this._projectId;
+    return this._projectId.getValue();
   }
 
   get content(): string | null {
@@ -80,12 +81,12 @@ export class Task extends AggregateRoot {
     completedAt?: Date
   ) {
     return new Task(
-      new TaskId(id),
-      new TaskTitle(title),
-      new TaskStatus(status),
-      new TaskPriority(priority),
-      projectId,
-      new UserId(userId),
+      TaskId.create(id),
+      TaskTitle.create(title),
+      TaskStatus.create(status),
+      TaskPriority.create(priority),
+      ProjectId.create(projectId),
+      UserId.create(userId),
       content ? TaskContent.create(content) || undefined : undefined,
       deadline,
       completedAt

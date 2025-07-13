@@ -6,7 +6,7 @@ import {
 } from "../../../domain/task/repositories/task.repository.interface";
 import { TaskResponseDto } from "../dto/responses/task.response.dto";
 import { Task } from "../../../domain/task/entities/task.entity";
-import { Inject } from "@nestjs/common";
+import { Inject, NotFoundException } from "@nestjs/common";
 
 @CommandHandler(UpdateTaskCommand)
 export class UpdateTaskHandler implements ICommandHandler<UpdateTaskCommand> {
@@ -18,7 +18,13 @@ export class UpdateTaskHandler implements ICommandHandler<UpdateTaskCommand> {
   async execute(command: UpdateTaskCommand): Promise<TaskResponseDto> {
     const { id, userId, updateTaskDto } = command;
 
-    const task = await this.taskReposiroty.save(
+    const task = await this.taskReposiroty.findById(id, userId);
+
+    if (!task) {
+      throw new NotFoundException("Task not found");
+    }
+
+    const updatedTask = await this.taskReposiroty.save(
       Task.create(
         id,
         updateTaskDto.title,
@@ -31,6 +37,6 @@ export class UpdateTaskHandler implements ICommandHandler<UpdateTaskCommand> {
       )
     );
 
-    return TaskResponseDto.fromEntity(task);
+    return TaskResponseDto.fromEntity(updatedTask);
   }
 }

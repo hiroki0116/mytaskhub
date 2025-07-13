@@ -3,42 +3,19 @@ import { TaskStatusEnum } from "../../../../domain/task/value-objects/task-statu
 import { Task } from "../../../../domain/task/entities/task.entity";
 
 export class TaskResponseDto {
-  id: string;
-  title: string;
-  status: TaskStatusEnum;
-  priority: PriorityEnum;
-  createdAt: Date;
-  updatedAt: Date;
-  projectId: string;
-  userId: string;
-  content?: string;
-  deadline?: Date;
-  completedAt?: Date;
   constructor(
-    id: string,
-    title: string,
-    status: TaskStatusEnum,
-    priority: PriorityEnum,
-    createdAt: Date,
-    updatedAt: Date,
-    projectId: string,
-    userId: string,
-    content?: string,
-    deadline?: Date,
-    completedAt?: Date
-  ) {
-    this.id = id;
-    this.title = title;
-    this.status = status;
-    this.createdAt = createdAt;
-    this.updatedAt = updatedAt;
-    this.projectId = projectId;
-    this.userId = userId;
-    this.priority = priority;
-    this.content = content;
-    this.deadline = deadline;
-    this.completedAt = completedAt;
-  }
+    public readonly id: string,
+    public readonly title: string,
+    public readonly status: TaskStatusEnum,
+    public readonly priority: PriorityEnum,
+    public readonly createdAt: Date,
+    public readonly updatedAt: Date,
+    public readonly projectId: string,
+    public readonly userId: string,
+    public readonly content?: string,
+    public readonly deadline?: Date,
+    public readonly completedAt?: Date
+  ) {}
 
   static fromEntity(task: Task) {
     return new TaskResponseDto(

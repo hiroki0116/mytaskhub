@@ -5,11 +5,12 @@ import {
   TASK_REPOSITORY,
 } from "../../../domain/task/repositories/task.repository.interface";
 import { UpdateTaskHandler } from "./update-task.handler";
-import { UpdateTaskDto } from "../dto/update-task.dto";
 import { Task } from "../../../domain/task/entities/task.entity";
 import { TaskStatusEnum } from "../../../domain/task/value-objects/task-status.value-object";
 import { PriorityEnum } from "../../../domain/task/value-objects/task-priority.value-object";
 import { TaskResponseDto } from "../dto/responses/task.response.dto";
+import { UpdateTaskDto } from "../dto/update-task.dto";
+import { NotFoundException } from "@nestjs/common";
 
 describe("UpdateTaskHandler", () => {
   let handler: UpdateTaskHandler;
@@ -19,20 +20,20 @@ describe("UpdateTaskHandler", () => {
     title: "更新されたタスク",
     status: TaskStatusEnum.IN_PROGRESS,
     priority: PriorityEnum.HIGH,
-    projectId: "project-123",
+    projectId: "project1234567890123456789012345",
     content: "更新されたタスクの内容",
     deadline: new Date("2024-12-31"),
   };
 
-  const mockUpdatedTask = Task.create(
-    "task-123",
-    mockUpdateTaskDto.title,
-    mockUpdateTaskDto.status,
-    mockUpdateTaskDto.priority,
-    mockUpdateTaskDto.projectId,
-    "user-123",
-    mockUpdateTaskDto.content,
-    mockUpdateTaskDto.deadline
+  const mockTask = Task.create(
+    "task1234567890123456789012345",
+    "更新されたタスク",
+    TaskStatusEnum.IN_PROGRESS,
+    PriorityEnum.HIGH,
+    "project1234567890123456789012345",
+    "user1234567890123456789012345",
+    "更新されたタスクの内容",
+    new Date("2024-12-31")
   );
 
   beforeEach(async () => {
@@ -42,6 +43,7 @@ describe("UpdateTaskHandler", () => {
         {
           provide: TASK_REPOSITORY,
           useValue: {
+            findById: jest.fn(),
             save: jest.fn(),
           },
         },
@@ -57,80 +59,68 @@ describe("UpdateTaskHandler", () => {
   });
 
   describe("execute", () => {
-    it("should update and return a task successfully", async () => {
-      const command = new UpdateTaskCommand("task-123", "user-123", mockUpdateTaskDto);
+    it("should update task successfully when task exists", async () => {
+      const command = new UpdateTaskCommand(
+        "task1234567890123456789012345",
+        "user1234567890123456789012345",
+        mockUpdateTaskDto
+      );
 
-      taskRepository.save.mockResolvedValue(mockUpdatedTask);
+      taskRepository.findById.mockResolvedValue(mockTask);
+      taskRepository.save.mockResolvedValue(mockTask);
 
       const result = await handler.execute(command);
 
       expect(result).toBeInstanceOf(TaskResponseDto);
-      expect(result.id).toBe(mockUpdatedTask.id);
-      expect(result.title).toBe(mockUpdatedTask.title);
-      expect(result.status).toBe(mockUpdatedTask.status);
-      expect(result.priority).toBe(mockUpdatedTask.priority);
-      expect(result.projectId).toBe(mockUpdatedTask.projectId);
-      expect(result.userId).toBe(mockUpdatedTask.userId);
-      expect(result.content).toBe(mockUpdatedTask.content);
-      expect(result.deadline).toEqual(mockUpdatedTask.deadline);
+      expect(result.id).toBe(mockTask.id);
+      expect(result.title).toBe(mockTask.title);
+      expect(result.status).toBe(mockTask.status);
+      expect(result.priority).toBe(mockTask.priority);
+      expect(result.projectId).toBe(mockTask.projectId);
+      expect(result.userId).toBe(mockTask.userId);
+      expect(result.content).toBe(mockTask.content);
+      expect(result.deadline).toEqual(mockTask.deadline);
 
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(taskRepository.findById).toHaveBeenCalledWith(
+        "task1234567890123456789012345",
+        "user1234567890123456789012345"
+      );
       // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(taskRepository.save).toHaveBeenCalledWith(
         expect.objectContaining({
-          id: "task-123",
+          id: "task1234567890123456789012345",
           title: mockUpdateTaskDto.title,
           status: mockUpdateTaskDto.status,
           priority: mockUpdateTaskDto.priority,
           projectId: mockUpdateTaskDto.projectId,
-          userId: "user-123",
+          userId: "user1234567890123456789012345",
           content: mockUpdateTaskDto.content,
           deadline: mockUpdateTaskDto.deadline,
         })
       );
     });
 
-    it("should update task without optional fields", async () => {
-      const updateTaskDtoWithoutOptional: UpdateTaskDto = {
-        title: "シンプル更新タスク",
-        status: TaskStatusEnum.DONE,
-        priority: PriorityEnum.LOW,
-        projectId: "project-456",
-      };
-
-      const simpleUpdatedTask = Task.create(
-        "task-456",
-        updateTaskDtoWithoutOptional.title,
-        updateTaskDtoWithoutOptional.status,
-        updateTaskDtoWithoutOptional.priority,
-        updateTaskDtoWithoutOptional.projectId,
-        "user-123"
+    it("should throw NotFoundException when task does not exist", async () => {
+      const command = new UpdateTaskCommand(
+        "nonexistenttask123456789012345",
+        "user1234567890123456789012345",
+        mockUpdateTaskDto
       );
 
-      const command = new UpdateTaskCommand("task-456", "user-123", updateTaskDtoWithoutOptional);
+      taskRepository.findById.mockResolvedValue(null);
 
-      taskRepository.save.mockResolvedValue(simpleUpdatedTask);
-
-      const result = await handler.execute(command);
-
-      expect(result).toBeInstanceOf(TaskResponseDto);
-      expect(result.title).toBe(updateTaskDtoWithoutOptional.title);
-      expect(result.status).toBe(updateTaskDtoWithoutOptional.status);
-      expect(result.priority).toBe(updateTaskDtoWithoutOptional.priority);
-      expect(result.projectId).toBe(updateTaskDtoWithoutOptional.projectId);
-      expect(result.content).toBeUndefined();
-      expect(result.deadline).toBeUndefined();
+      await expect(handler.execute(command)).rejects.toThrow(
+        new NotFoundException("Task not found")
+      );
 
       // eslint-disable-next-line @typescript-eslint/unbound-method
-      expect(taskRepository.save).toHaveBeenCalledWith(
-        expect.objectContaining({
-          id: "task-456",
-          title: updateTaskDtoWithoutOptional.title,
-          status: updateTaskDtoWithoutOptional.status,
-          priority: updateTaskDtoWithoutOptional.priority,
-          projectId: updateTaskDtoWithoutOptional.projectId,
-          userId: "user-123",
-        })
+      expect(taskRepository.findById).toHaveBeenCalledWith(
+        "nonexistenttask123456789012345",
+        "user1234567890123456789012345"
       );
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(taskRepository.save).not.toHaveBeenCalled();
     });
   });
 });

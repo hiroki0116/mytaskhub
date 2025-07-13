@@ -15,12 +15,12 @@ describe("DeleteTaskHandler", () => {
   let taskRepository: jest.Mocked<ITaskRepository>;
 
   const mockTask = Task.create(
-    "task-123",
+    "task1234567890123456789012345",
     "削除対象タスク",
     TaskStatusEnum.TODO,
     PriorityEnum.MEDIUM,
-    "project-123",
-    "user-123",
+    "project1234567890123456789012345",
+    "user1234567890123456789012345",
     "削除対象タスクの内容",
     new Date("2024-12-31")
   );
@@ -49,7 +49,10 @@ describe("DeleteTaskHandler", () => {
 
   describe("execute", () => {
     it("should delete task successfully when task exists", async () => {
-      const command = new DeleteTaskCommand("task-123", "user-123");
+      const command = new DeleteTaskCommand(
+        "task1234567890123456789012345",
+        "user1234567890123456789012345"
+      );
 
       taskRepository.findById.mockResolvedValue(mockTask);
       taskRepository.delete.mockResolvedValue(undefined);
@@ -57,13 +60,22 @@ describe("DeleteTaskHandler", () => {
       await expect(handler.execute(command)).resolves.toBeUndefined();
 
       // eslint-disable-next-line @typescript-eslint/unbound-method
-      expect(taskRepository.findById).toHaveBeenCalledWith("task-123", "user-123");
+      expect(taskRepository.findById).toHaveBeenCalledWith(
+        "task1234567890123456789012345",
+        "user1234567890123456789012345"
+      );
       // eslint-disable-next-line @typescript-eslint/unbound-method
-      expect(taskRepository.delete).toHaveBeenCalledWith("task-123", "user-123");
+      expect(taskRepository.delete).toHaveBeenCalledWith(
+        "task1234567890123456789012345",
+        "user1234567890123456789012345"
+      );
     });
 
     it("should throw NotFoundException when task does not exist", async () => {
-      const command = new DeleteTaskCommand("non-existent-task", "user-123");
+      const command = new DeleteTaskCommand(
+        "nonexistenttask123456789012345",
+        "user1234567890123456789012345"
+      );
 
       taskRepository.findById.mockResolvedValue(null);
 
@@ -72,13 +84,19 @@ describe("DeleteTaskHandler", () => {
       );
 
       // eslint-disable-next-line @typescript-eslint/unbound-method
-      expect(taskRepository.findById).toHaveBeenCalledWith("non-existent-task", "user-123");
+      expect(taskRepository.findById).toHaveBeenCalledWith(
+        "nonexistenttask123456789012345",
+        "user1234567890123456789012345"
+      );
       // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(taskRepository.delete).not.toHaveBeenCalled();
     });
 
     it("should throw NotFoundException when task belongs to different user", async () => {
-      const command = new DeleteTaskCommand("task-123", "different-user");
+      const command = new DeleteTaskCommand(
+        "task1234567890123456789012345",
+        "differentuser123456789012345"
+      );
 
       taskRepository.findById.mockResolvedValue(null);
 
@@ -87,7 +105,10 @@ describe("DeleteTaskHandler", () => {
       );
 
       // eslint-disable-next-line @typescript-eslint/unbound-method
-      expect(taskRepository.findById).toHaveBeenCalledWith("task-123", "different-user");
+      expect(taskRepository.findById).toHaveBeenCalledWith(
+        "task1234567890123456789012345",
+        "differentuser123456789012345"
+      );
       // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(taskRepository.delete).not.toHaveBeenCalled();
     });

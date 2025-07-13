@@ -23,11 +23,11 @@ describe("TaskController", () => {
   );
 
   const mockTask = Task.create(
-    "task-123",
+    "task1234567890123456789012345",
     "テストタスク",
     TaskStatusEnum.TODO,
     PriorityEnum.MEDIUM,
-    "project-123",
+    "project1234567890123456789012345",
     "abcDEFGHIJKLmnopqrSTUVwxYZ123456789",
     "テストタスクの内容",
     new Date("2024-12-31")
@@ -102,7 +102,7 @@ describe("TaskController", () => {
     it("should return specific task by id", async () => {
       queryBus.execute.mockResolvedValue(mockTaskResponse);
 
-      const result = await controller.getTaskById("task-123", mockUser);
+      const result = await controller.getTaskById("task1234567890123456789012345", mockUser);
 
       expect(result).toBeDefined();
       expect(result.success).toBe(true);
@@ -113,7 +113,7 @@ describe("TaskController", () => {
       // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(queryBus.execute).toHaveBeenCalledWith(
         expect.objectContaining({
-          id: "task-123",
+          id: "task1234567890123456789012345",
           userId: mockUser.id,
         })
       );
@@ -126,7 +126,7 @@ describe("TaskController", () => {
         title: "新しいタスク",
         status: TaskStatusEnum.TODO,
         priority: PriorityEnum.HIGH,
-        projectId: "project-123",
+        projectId: "project1234567890123456789012345",
         content: "新しいタスクの内容",
         deadline: new Date("2024-12-31"),
       };
@@ -155,11 +155,11 @@ describe("TaskController", () => {
         title: "シンプルタスク",
         status: TaskStatusEnum.TODO,
         priority: PriorityEnum.LOW,
-        projectId: "project-456",
+        projectId: "project456789012345678901234567890",
       };
 
       const simpleTask = Task.create(
-        "task-456",
+        "task456789012345678901234567890",
         createTaskDto.title,
         createTaskDto.status,
         createTaskDto.priority,
@@ -187,13 +187,13 @@ describe("TaskController", () => {
         title: "更新されたタスク",
         status: TaskStatusEnum.IN_PROGRESS,
         priority: PriorityEnum.HIGH,
-        projectId: "project-123",
+        projectId: "project1234567890123456789012345",
         content: "更新されたタスクの内容",
         deadline: new Date("2024-12-31"),
       };
 
       const updatedTask = Task.create(
-        "task-123",
+        "task1234567890123456789012345",
         updateTaskDto.title,
         updateTaskDto.status,
         updateTaskDto.priority,
@@ -207,7 +207,11 @@ describe("TaskController", () => {
 
       commandBus.execute.mockResolvedValue(updatedTaskResponse);
 
-      const result = await controller.updateTask("task-123", updateTaskDto, mockUser);
+      const result = await controller.updateTask(
+        "task1234567890123456789012345",
+        updateTaskDto,
+        mockUser
+      );
 
       expect(result).toBeDefined();
       expect(result.success).toBe(true);
@@ -218,7 +222,7 @@ describe("TaskController", () => {
       // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(commandBus.execute).toHaveBeenCalledWith(
         expect.objectContaining({
-          id: "task-123",
+          id: "task1234567890123456789012345",
           userId: mockUser.id,
           updateTaskDto,
         })
@@ -230,11 +234,11 @@ describe("TaskController", () => {
         title: "シンプル更新タスク",
         status: TaskStatusEnum.DONE,
         priority: PriorityEnum.LOW,
-        projectId: "project-456",
+        projectId: "project456789012345678901234567890",
       };
 
       const simpleUpdatedTask = Task.create(
-        "task-456",
+        "task456789012345678901234567890",
         updateTaskDto.title,
         updateTaskDto.status,
         updateTaskDto.priority,
@@ -246,7 +250,11 @@ describe("TaskController", () => {
 
       commandBus.execute.mockResolvedValue(simpleUpdatedTaskResponse);
 
-      const result = await controller.updateTask("task-456", updateTaskDto, mockUser);
+      const result = await controller.updateTask(
+        "task456789012345678901234567890",
+        updateTaskDto,
+        mockUser
+      );
 
       expect(result).toBeDefined();
       expect(result.success).toBe(true);
@@ -260,7 +268,7 @@ describe("TaskController", () => {
     it("should delete an existing task", async () => {
       commandBus.execute.mockResolvedValue(undefined);
 
-      const result = await controller.deleteTask("task-123", mockUser);
+      const result = await controller.deleteTask("task1234567890123456789012345", mockUser);
 
       expect(result).toBeDefined();
       expect(result.success).toBe(true);
@@ -271,7 +279,7 @@ describe("TaskController", () => {
       // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(commandBus.execute).toHaveBeenCalledWith(
         expect.objectContaining({
-          id: "task-123",
+          id: "task1234567890123456789012345",
           userId: mockUser.id,
         })
       );

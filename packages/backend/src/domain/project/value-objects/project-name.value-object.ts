@@ -1,11 +1,11 @@
-export class TaskContent {
+export class ProjectName {
   constructor(private readonly value: string) {}
 
-  public static create(value: string): TaskContent | null {
+  public static create(value: string): ProjectName {
     if (!value || value.trim() === "") {
-      throw new Error("無効なタスク内容形式です");
+      throw new Error("無効なプロジェクト名形式です");
     }
-    return new TaskContent(value);
+    return new ProjectName(value);
   }
 
   public getValue(): string {

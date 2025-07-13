@@ -16,32 +16,32 @@ describe("GetTasksQueryHandler", () => {
 
   const mockTasks = [
     Task.create(
-      "task-1",
+      "task1234567890123456789012345",
       "テストタスク1",
       TaskStatusEnum.TODO,
       PriorityEnum.HIGH,
-      "project-123",
-      "user-123",
+      "project1234567890123456789012345",
+      "user1234567890123456789012345",
       "テストタスク1の内容",
       new Date("2024-12-31")
     ),
     Task.create(
-      "task-2",
+      "task2345678901234567890123456",
       "テストタスク2",
       TaskStatusEnum.IN_PROGRESS,
       PriorityEnum.MEDIUM,
-      "project-123",
-      "user-123",
+      "project1234567890123456789012345",
+      "user1234567890123456789012345",
       "テストタスク2の内容",
       new Date("2024-12-30")
     ),
     Task.create(
-      "task-3",
+      "task3456789012345678901234567",
       "テストタスク3",
       TaskStatusEnum.DONE,
       PriorityEnum.LOW,
-      "project-456",
-      "user-123"
+      "project456789012345678901234567890",
+      "user1234567890123456789012345"
     ),
   ];
 
@@ -68,7 +68,7 @@ describe("GetTasksQueryHandler", () => {
 
   describe("execute", () => {
     it("should return tasks when tasks exist", async () => {
-      const query = new GetTasksQuery("user-123");
+      const query = new GetTasksQuery("user1234567890123456789012345");
 
       taskRepository.findManyByUserId.mockResolvedValue(mockTasks);
 
@@ -79,27 +79,27 @@ describe("GetTasksQueryHandler", () => {
       expect(result[1]).toBeInstanceOf(TaskResponseDto);
       expect(result[2]).toBeInstanceOf(TaskResponseDto);
 
-      expect(result[0].id).toBe("task-1");
+      expect(result[0].id).toBe("task1234567890123456789012345");
       expect(result[0].title).toBe("テストタスク1");
       expect(result[0].status).toBe(TaskStatusEnum.TODO);
       expect(result[0].priority).toBe(PriorityEnum.HIGH);
 
-      expect(result[1].id).toBe("task-2");
+      expect(result[1].id).toBe("task2345678901234567890123456");
       expect(result[1].title).toBe("テストタスク2");
       expect(result[1].status).toBe(TaskStatusEnum.IN_PROGRESS);
       expect(result[1].priority).toBe(PriorityEnum.MEDIUM);
 
-      expect(result[2].id).toBe("task-3");
+      expect(result[2].id).toBe("task3456789012345678901234567");
       expect(result[2].title).toBe("テストタスク3");
       expect(result[2].status).toBe(TaskStatusEnum.DONE);
       expect(result[2].priority).toBe(PriorityEnum.LOW);
 
       // eslint-disable-next-line @typescript-eslint/unbound-method
-      expect(taskRepository.findManyByUserId).toHaveBeenCalledWith("user-123");
+      expect(taskRepository.findManyByUserId).toHaveBeenCalledWith("user1234567890123456789012345");
     });
 
     it("should return empty array when no tasks exist", async () => {
-      const query = new GetTasksQuery("user-123");
+      const query = new GetTasksQuery("user1234567890123456789012345");
 
       taskRepository.findManyByUserId.mockResolvedValue([]);
 
@@ -109,7 +109,7 @@ describe("GetTasksQueryHandler", () => {
       expect(Array.isArray(result)).toBe(true);
 
       // eslint-disable-next-line @typescript-eslint/unbound-method
-      expect(taskRepository.findManyByUserId).toHaveBeenCalledWith("user-123");
+      expect(taskRepository.findManyByUserId).toHaveBeenCalledWith("user1234567890123456789012345");
     });
   });
 });

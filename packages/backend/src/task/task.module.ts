@@ -8,6 +8,7 @@ import { TaskController } from "../presentation/controllers/task.controller";
 import { CreateTaskHandler } from "../application/task/handlers/create-task.handler";
 import { GetTaskQueryHandler } from "../application/task/handlers/get-task.handler";
 import { GetTasksQueryHandler } from "../application/task/handlers/get-tasks.handler";
+import { GetTasksByProjectHandler } from "../application/task/handlers/get-tasks-by-project.handler";
 import { UpdateTaskHandler } from "../application/task/handlers/update-task.handler";
 import { DeleteTaskHandler } from "../application/task/handlers/delete-task.handler";
 
@@ -23,6 +24,7 @@ import { DeleteTaskHandler } from "../application/task/handlers/delete-task.hand
     CreateTaskHandler,
     GetTaskQueryHandler,
     GetTasksQueryHandler,
+    GetTasksByProjectHandler,
     UpdateTaskHandler,
     DeleteTaskHandler,
   ],

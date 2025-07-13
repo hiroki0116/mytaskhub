@@ -13,6 +13,7 @@ import { GetTaskQuery } from "../../application/task/queries/get-task.query";
 import { CreateTaskCommand } from "../../application/task/commands/create-task.command";
 import { UpdateTaskCommand } from "../../application/task/commands/update-task.command";
 import { DeleteTaskCommand } from "../../application/task/commands/delete-task.command";
+import { GetTasksByProjectQuery } from "../../application/task/queries/get-tasks-by-project.query";
 
 @ApiTags("タスク")
 @Controller("tasks")
@@ -28,6 +29,21 @@ export class TaskController {
       new GetTasksQuery(user.id)
     );
     return ApiResponseWrapper.success(tasks, "タスク取得が完了しました", HttpStatus.OK);
+  }
+
+  @Get("project/:projectId")
+  async getTasksByProject(
+    @Param("projectId") projectId: string,
+    @CurrentUser() user: User
+  ): Promise<ApiResponse<TaskResponseDto[]>> {
+    const tasks = await this.queryBus.execute<GetTasksByProjectQuery, TaskResponseDto[]>(
+      new GetTasksByProjectQuery(projectId, user.id)
+    );
+    return ApiResponseWrapper.success(
+      tasks,
+      "プロジェクト配下のタスク取得が完了しました",
+      HttpStatus.OK
+    );
   }
 
   @Get(":id")

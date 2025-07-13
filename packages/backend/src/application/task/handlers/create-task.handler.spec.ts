@@ -5,34 +5,34 @@ import {
   TASK_REPOSITORY,
 } from "../../../domain/task/repositories/task.repository.interface";
 import { CreateTaskHandler } from "./create-task.handler";
-import { CreateTaskDto } from "../dto/create-task.dto";
 import { Task } from "../../../domain/task/entities/task.entity";
 import { TaskStatusEnum } from "../../../domain/task/value-objects/task-status.value-object";
 import { PriorityEnum } from "../../../domain/task/value-objects/task-priority.value-object";
 import { TaskResponseDto } from "../dto/responses/task.response.dto";
+import { CreateTaskDto } from "../dto/create-task.dto";
 
 describe("CreateTaskHandler", () => {
   let handler: CreateTaskHandler;
   let taskRepository: jest.Mocked<ITaskRepository>;
 
   const mockCreateTaskDto: CreateTaskDto = {
-    title: "テストタスク",
+    title: "新しいタスク",
     status: TaskStatusEnum.TODO,
     priority: PriorityEnum.MEDIUM,
-    projectId: "project-123",
-    content: "テストタスクの内容",
+    projectId: "project1234567890123456789012345",
+    content: "新しいタスクの内容",
     deadline: new Date("2024-12-31"),
   };
 
   const mockTask = Task.create(
-    "task-123",
-    mockCreateTaskDto.title,
-    mockCreateTaskDto.status,
-    mockCreateTaskDto.priority,
-    mockCreateTaskDto.projectId,
-    "user-123",
-    mockCreateTaskDto.content,
-    mockCreateTaskDto.deadline
+    "task1234567890123456789012345",
+    "新しいタスク",
+    TaskStatusEnum.TODO,
+    PriorityEnum.MEDIUM,
+    "project1234567890123456789012345",
+    "user1234567890123456789012345",
+    "新しいタスクの内容",
+    new Date("2024-12-31")
   );
 
   beforeEach(async () => {
@@ -57,8 +57,8 @@ describe("CreateTaskHandler", () => {
   });
 
   describe("execute", () => {
-    it("should create and return a task successfully", async () => {
-      const command = new CreateTaskCommand("user-123", mockCreateTaskDto);
+    it("should create a new task successfully", async () => {
+      const command = new CreateTaskCommand("user1234567890123456789012345", mockCreateTaskDto);
 
       taskRepository.save.mockResolvedValue(mockTask);
 
@@ -82,7 +82,7 @@ describe("CreateTaskHandler", () => {
           status: mockCreateTaskDto.status,
           priority: mockCreateTaskDto.priority,
           projectId: mockCreateTaskDto.projectId,
-          userId: "user-123",
+          userId: "user1234567890123456789012345",
           content: mockCreateTaskDto.content,
           deadline: mockCreateTaskDto.deadline,
         })
@@ -90,43 +90,37 @@ describe("CreateTaskHandler", () => {
     });
 
     it("should create task without optional fields", async () => {
-      const createTaskDtoWithoutOptional: CreateTaskDto = {
+      const simpleCreateTaskDto: CreateTaskDto = {
         title: "シンプルタスク",
         status: TaskStatusEnum.TODO,
         priority: PriorityEnum.LOW,
-        projectId: "project-456",
+        projectId: "project456789012345678901234567890",
       };
 
       const simpleTask = Task.create(
-        "task-456",
-        createTaskDtoWithoutOptional.title,
-        createTaskDtoWithoutOptional.status,
-        createTaskDtoWithoutOptional.priority,
-        createTaskDtoWithoutOptional.projectId,
-        "user-123"
+        "task456789012345678901234567890",
+        simpleCreateTaskDto.title,
+        simpleCreateTaskDto.status,
+        simpleCreateTaskDto.priority,
+        simpleCreateTaskDto.projectId,
+        "user1234567890123456789012345"
       );
 
-      const command = new CreateTaskCommand("user-123", createTaskDtoWithoutOptional);
+      const command = new CreateTaskCommand("user1234567890123456789012345", simpleCreateTaskDto);
 
       taskRepository.save.mockResolvedValue(simpleTask);
 
       const result = await handler.execute(command);
 
       expect(result).toBeInstanceOf(TaskResponseDto);
-      expect(result.title).toBe(createTaskDtoWithoutOptional.title);
+      expect(result.id).toBe(simpleTask.id);
+      expect(result.title).toBe(simpleTask.title);
+      expect(result.status).toBe(simpleTask.status);
+      expect(result.priority).toBe(simpleTask.priority);
+      expect(result.projectId).toBe(simpleTask.projectId);
+      expect(result.userId).toBe(simpleTask.userId);
       expect(result.content).toBeUndefined();
       expect(result.deadline).toBeUndefined();
-
-      // eslint-disable-next-line @typescript-eslint/unbound-method
-      expect(taskRepository.save).toHaveBeenCalledWith(
-        expect.objectContaining({
-          title: createTaskDtoWithoutOptional.title,
-          status: createTaskDtoWithoutOptional.status,
-          priority: createTaskDtoWithoutOptional.priority,
-          projectId: createTaskDtoWithoutOptional.projectId,
-          userId: "user-123",
-        })
-      );
     });
   });
 });

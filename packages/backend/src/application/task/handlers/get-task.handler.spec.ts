@@ -16,12 +16,12 @@ describe("GetTaskQueryHandler", () => {
   let taskRepository: jest.Mocked<ITaskRepository>;
 
   const mockTask = Task.create(
-    "task-123",
+    "task1234567890123456789012345",
     "テストタスク",
     TaskStatusEnum.TODO,
     PriorityEnum.MEDIUM,
-    "project-123",
-    "user-123",
+    "project1234567890123456789012345",
+    "user1234567890123456789012345",
     "テストタスクの内容",
     new Date("2024-12-31")
   );
@@ -49,7 +49,10 @@ describe("GetTaskQueryHandler", () => {
 
   describe("execute", () => {
     it("should return task when task exists", async () => {
-      const query = new GetTaskQuery("task-123", "user-123");
+      const query = new GetTaskQuery(
+        "task1234567890123456789012345",
+        "user1234567890123456789012345"
+      );
 
       taskRepository.findById.mockResolvedValue(mockTask);
 
@@ -66,11 +69,17 @@ describe("GetTaskQueryHandler", () => {
       expect(result.deadline).toEqual(mockTask.deadline);
 
       // eslint-disable-next-line @typescript-eslint/unbound-method
-      expect(taskRepository.findById).toHaveBeenCalledWith("task-123", "user-123");
+      expect(taskRepository.findById).toHaveBeenCalledWith(
+        "task1234567890123456789012345",
+        "user1234567890123456789012345"
+      );
     });
 
     it("should throw NotFoundException when task does not exist", async () => {
-      const query = new GetTaskQuery("non-existent-task", "user-123");
+      const query = new GetTaskQuery(
+        "nonexistenttask123456789012345",
+        "user1234567890123456789012345"
+      );
 
       taskRepository.findById.mockResolvedValue(null);
 
@@ -79,7 +88,10 @@ describe("GetTaskQueryHandler", () => {
       );
 
       // eslint-disable-next-line @typescript-eslint/unbound-method
-      expect(taskRepository.findById).toHaveBeenCalledWith("non-existent-task", "user-123");
+      expect(taskRepository.findById).toHaveBeenCalledWith(
+        "nonexistenttask123456789012345",
+        "user1234567890123456789012345"
+      );
     });
   });
 });
